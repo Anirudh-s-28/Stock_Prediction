@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockSage AI - Intelligent Stock Predictions</title>
+    <link rel="icon" type="image/x-icon" href="https://static.photos/finance/200x200/42">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        .prediction-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .typewriter {
+            border-right: 3px solid rgba(255,255,255,.75);
+            animation: blink-caret .75s step-end infinite;
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: rgba(255,255,255,.75); }
+        }
+    </style>
+</head>
+<body class="gradient-bg text-white min-h-screen">
+    <div id="vanta-bg" class="fixed top-0 left-0 w-full h-full z-0"></div>
+    
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-12">
+            <div class="flex items-center mb-4 md:mb-0">
+                <i data-feather="trending-up" class="text-green-400 mr-3 w-8 h-8"></i>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+                    StockSage AI
+                </h1>
+            </div>
+            <nav class="flex space-x-6">
+                <a href="#" class="hover:text-green-400 transition">Home</a>
+                <a href="#" class="hover:text-green-400 transition">How It Works</a>
+                <a href="#" class="hover:text-green-400 transition">About Model</a>
+                <a href="#" class="hover:text-green-400 transition">Contact</a>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="mb-16 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">AI-Powered Stock Market <span class="typewriter">Predictions</span></h2>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                Our hybrid ARIMA-LSTM model analyzes market trends while our AI explains predictions in plain English. Get intelligent insights about your stocks.
+            </p>
+        </section>
+
+        <!-- Prediction Form -->
+        <section class="mb-16 max-w-4xl mx-auto">
+            <div class="prediction-card rounded-xl p-6 shadow-lg border border-gray-700">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i data-feather="search" class="mr-3 text-blue-400"></i> Ask StockSage
+                </h3>
+                
+                <form id="predictionForm" class="space-y-6">
+                    <div>
+                        <label for="stockQuery" class="block text-lg mb-2">Your Stock Question</label>
+                        <input type="text" id="stockQuery" 
+                               class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                               placeholder="E.g. Will Apple stock rise next week?" required>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="stockSymbol" class="block text-lg mb-2">Stock Symbol</label>
+                            <input type="text" id="stockSymbol" 
+                                   class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                   placeholder="E.g. AAPL" required>
+                        </div>
+                        
+                        <div>
+                            <label for="timeframe" class="block text-lg mb-2">Prediction Timeframe</label>
+                            <select id="timeframe" 
+                                    class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="1d">1 Day</option>
+                                <option value="1w">1 Week</option>
+                                <option value="1m">1 Month</option>
+                                <option value="3m">3 Months</option>
+                                <option value="1y">1 Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center">
+                        <i data-feather="zap" class="mr-2"></i> Get Prediction
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Sample Prediction Result (Hidden by default) -->
+        <section id="resultSection" class="hidden max-w-4xl mx-auto mb-16">
+            <div class="prediction-card rounded-xl p-6 shadow-lg border border-gray-700">
+                <div class="flex justify-between items-start mb-6">
+                    <h3 class="text-2xl font-semibold flex items-center">
+                        <i data-feather="activity" class="mr-3 text-green-400"></i> Prediction Results
+                    </h3>
+                    <span id="stockInfo" class="text-lg font-medium">AAPL • 1 Week Forecast</span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="text-lg font-medium mb-3">Model Confidence</h4>
+                            <div class="h-4 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-yellow-400 to-green-500 rounded-full" style="width: 78%"></div>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-2">78% confidence in prediction accuracy</p>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="text-lg font-medium mb-3">Predicted Movement</h4>
+                            <div class="flex items-center">
+                                <div class="text-3xl font-bold text-green-400 mr-3">+2.3%</div>
+                                <div class="text-sm">
+                                    <p>Expected price change</p>
+                                    <p class="text-gray-400">from $173.42 to ~$177.41</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="text-lg font-medium mb-3">Volatility Alert</h4>
+                            <div class="flex items-center text-yellow-400">
+                                <i data-feather="alert-triangle" class="mr-2"></i>
+                                <span>Moderate volatility expected</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <canvas id="priceChart" class="w-full h-64"></canvas>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h4 class="text-xl font-medium mb-4 flex items-center">
+                        <i data-feather="message-square" class="mr-2 text-blue-400"></i> AI Interpretation
+                    </h4>
+                    <div id="aiResponse" class="bg-gray-800 p-4 rounded-lg">
+                        <p>Based on our ARIMA-LSTM analysis of AAPL's recent performance and market conditions, we predict a moderate upward trend (~2.3%) over the next week. This is supported by:</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li>Strong Q2 earnings report released yesterday</li>
+                            <li>Positive sentiment in tech sector overall</li>
+                            <li>Historical seasonal patterns showing mid-May upticks</li>
+                        </ul>
+                        <p class="mt-2">However, be aware of potential volatility from the upcoming Fed meeting minutes release on Wednesday which could cause short-term fluctuations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="max-w-4xl mx-auto mb-16">
+            <h3 class="text-2xl font-semibold mb-8 text-center">How StockSage AI Works</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-blue-500 transition">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="upload" class="text-blue-400"></i>
+                    </div>
+                    <h4 class="text-lg font-medium mb-2">1. Enter Your Query</h4>
+                    <p class="text-gray-400">Ask any stock-related question in natural language and provide the stock symbol.</p>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-green-500 transition">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="cpu" class="text-green-400"></i>
+                    </div>
+                    <h4 class="text-lg font-medium mb-2">2. Hybrid Model Analysis</h4>
+                    <p class="text-gray-400">Our ARIMA-LSTM model processes historical data and current market conditions.</p>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 hover:border-purple-500 transition">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="message-circle" class="text-purple-400"></i>
+                    </div>
+                    <h4 class="text-lg font-medium mb-2">3. AI Interpretation</h4>
+                    <p class="text-gray-400">Get easy-to-understand explanations of predictions with key factors highlighted.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-gray-800 pt-8 mt-12">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i data-feather="trending-up" class="text-green-400 mr-3"></i>
+                    <span class="text-xl font-medium">StockSage AI</span>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-green-400 transition"><i data-feather="twitter"></i></a>
+                    <a href="#" class="hover:text-green-400 transition"><i data-feather="github"></i></a>
+                    <a href="#" class="hover:text-green-400 transition"><i data-feather="linkedin"></i></a>
+                </div>
+            </div>
+        <p class="text-center text-gray-500 mt-8">
+            © 2025 StockSage AI. Powered by hybrid ARIMA-LSTM model and GPT-4. Not financial advice.
+        </p>
+</footer>
+    </div>
+
+    <script>
+        // Initialize Vanta.js background
+        VANTA.NET({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x3b82f6,
+            backgroundColor: 0x0f172a,
+            points: 12.00,
+            maxDistance: 22.00,
+            spacing: 17.00
+        });
+
+        // Initialize feather icons
+        feather.replace();
+
+        // Sample Chart.js implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            const priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Today', '1D', '2D', '3D', '4D', '5D', '6D', '7D'],
+                    datasets: [{
+                        label: 'Predicted Price',
+                        data: [173.42, 173.85, 174.30, 175.12, 176.04, 176.78, 177.15, 177.41],
+                        borderColor: '#4ade80',
+                        backgroundColor: 'rgba(74, 222, 128, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        // Form submission handler
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i data-feather="loader" class="animate-spin mr-2"></i> Analyzing...';
+            feather.replace();
+            
+            // Get form values
+            const stockSymbol = document.getElementById('stockSymbol').value;
+            const timeframe = document.getElementById('timeframe').value;
+            const query = document.getElementById('stockQuery').value;
+            
+            try {
+                // First get stock prediction from our ML model API
+                const predictionResponse = await fetch('https://api.stockoracle.ai/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        symbol: stockSymbol,
+                        timeframe: timeframe
+                    })
+                });
+                const predictionData = await predictionResponse.json();
+                
+                // Then get AI interpretation from OpenAI API
+                const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4",
+                        messages: [{
+                            role: "system",
+                            content: "You are a financial analyst explaining stock predictions in simple terms. Highlight key factors and risks."
+                        },{
+                            role: "user",
+                            content: `Explain this stock prediction to a retail investor: ${JSON.stringify(predictionData)}. 
+                                      Original question: ${query}. Keep it under 200 words.`
+                        }]
+                    })
+                });
+                const aiData = await aiResponse.json();
+                
+                // Update UI with real data
+                document.getElementById('stockInfo').textContent = `${stockSymbol} • ${timeframe} Forecast`;
+                document.getElementById('aiResponse').innerHTML = aiData.choices[0].message.content;
+                
+                // Show results
+                document.getElementById('resultSection').classList.remove('hidden');
+                
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                feather.replace();
+                
+                // Scroll to results
+                document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                alert('Error getting prediction. Please try again.');
+                submitBtn.innerHTML = originalText;
+                feather.replace();
+            }
+        });
+</script>
+</body>
+</html>
