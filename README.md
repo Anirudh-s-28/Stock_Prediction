@@ -1,1 +1,1 @@
-# IDS-Stock_Prediction
+# Stock_Prediction using Hybrid LSTM - ARIMA
